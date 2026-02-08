@@ -6,16 +6,16 @@
  * Tokens are stored as Cloudflare Secrets for secure access.
  */
 
-import { McpAgent } from 'agents/mcp'
+/// <reference path="../worker-configuration.d.ts" />
+// @ts-ignore - Using agents' bundled MCP SDK
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { z } from 'zod'
 
-interface Env {
-  MCP_AGENT: DurableObjectNamespace<LinkedInMcpAgent>
+// Local Env type that includes both wrangler-generated bindings and secrets
+interface Env extends Cloudflare.Env {
   LINKEDIN_TOKEN_PERSONAL?: string
   LINKEDIN_TOKEN_MOBICYCLE?: string
   LINKEDIN_TOKEN_MOBICYCLE_PRODUCTIONS?: string
-  API_VERSION?: string
 }
 
 interface Account {
@@ -122,7 +122,7 @@ export class LinkedInMcpAgent extends McpAgent<Env> {
       },
       async ({ content, account, visibility }) => {
         try {
-          const acct = ACCOUNTS[account]
+          const acct = ACCOUNTS[account]!
           const creds = await loadToken(this.env, account)
 
           const postData = {
@@ -160,7 +160,7 @@ export class LinkedInMcpAgent extends McpAgent<Env> {
       },
       async ({ content, article_url, article_title, article_description, account, visibility }) => {
         try {
-          const acct = ACCOUNTS[account]
+          const acct = ACCOUNTS[account]!
           const creds = await loadToken(this.env, account)
 
           const postData: Record<string, unknown> = {
@@ -221,7 +221,7 @@ export class LinkedInMcpAgent extends McpAgent<Env> {
       async ({ account }) => {
         try {
           const creds = await loadToken(this.env, account)
-          const acct = ACCOUNTS[account]
+          const acct = ACCOUNTS[account]!
           const profile = await apiRequest("GET", "https://api.linkedin.com/v2/userinfo", creds.access_token, apiVersion)
 
           const info: Record<string, unknown> = {
@@ -270,7 +270,7 @@ export class LinkedInMcpAgent extends McpAgent<Env> {
       },
       async ({ account, count }) => {
         try {
-          const acct = ACCOUNTS[account]
+          const acct = ACCOUNTS[account]!
           const creds = await loadToken(this.env, account)
 
           const url = `https://api.linkedin.com/rest/posts?author=${encodeURIComponent(acct.authorUrn)}&count=${count}`
