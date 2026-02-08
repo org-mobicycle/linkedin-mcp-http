@@ -7,7 +7,7 @@
  */
 
 /// <reference path="../worker-configuration.d.ts" />
-// @ts-ignore - Using agents' bundled MCP SDK
+import { McpAgent } from 'agents/mcp'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { z } from 'zod'
 
